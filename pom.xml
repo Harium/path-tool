@@ -24,12 +24,17 @@
         <dependency>
             <groupId>com.harium.etyl</groupId>
             <artifactId>geometry</artifactId>
-            <version>1.0.5</version>
+            <version>1.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.harium.etyl</groupId>
             <artifactId>etyl</artifactId>
             <version>1.4.4</version>
+        </dependency>
+        <dependency>
+            <groupId>gov.nist.math</groupId>
+            <artifactId>jama</artifactId>
+            <version>1.0.3</version>
         </dependency>
     </dependencies>
     <developers>
@@ -65,7 +70,7 @@
                     <target>1.8</target>
                     <optimize>true</optimize>
                     <excludes>
-                        <exclude>**/example/*</exclude>
+                        <exclude>**/examples/*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

@@ -1,6 +1,5 @@
-package example;
+package examples;
 
-import com.badlogic.gdx.math.Vector2;
 import com.harium.etyl.Etyl;
 import com.harium.etyl.commons.context.Application;
 import com.harium.etyl.commons.event.KeyEvent;
@@ -9,19 +8,24 @@ import com.harium.etyl.commons.event.PointerEvent;
 import com.harium.etyl.commons.event.PointerState;
 import com.harium.etyl.commons.graphics.Color;
 import com.harium.etyl.core.graphics.Graphics;
-import com.harium.etyl.geometry.curve.*;
+import com.harium.etyl.geometry.Path2D;
+import com.harium.etyl.geometry.Point2D;
+import com.harium.etyl.geometry.curve.CubicBezier;
+import com.harium.etyl.geometry.curve.Curve;
+import com.harium.etyl.geometry.curve.QuadraticBezier;
+import com.harium.etyl.geometry.path.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Main extends Etyl {
+public class PathTool extends Etyl {
 
-    public Main() {
+    public PathTool() {
         super(800, 600);
     }
 
     public static void main(String[] args) {
-        Main app = new Main();
+        PathTool app = new PathTool();
         app.setTitle("Path Maker");
         app.init();
     }
@@ -36,11 +40,11 @@ public class Main extends Etyl {
         private static final int POINT_SIZE = 6;
         private static final int HALF_POINT_SIZE = POINT_SIZE / 2;
 
-        List<CurvePath> paths = new ArrayList<>();
+        List<Path2D> paths = new ArrayList<>();
         // Current Path
-        private CurvePath path = new CurvePath();
+        private Path2D path = new Path2D();
 
-        private Vector2 mousePosition = new Vector2();
+        private Point2D mousePosition = new Point2D();
 
         public HelloWorld(int w, int h) {
             super(w, h);
@@ -48,19 +52,19 @@ public class Main extends Etyl {
 
         @Override
         public void load() {
-            CurvePath a = new CurvePath();
-            CurvePath b = new CurvePath();
-            CurvePath c = new CurvePath();
+            Path2D a = new Path2D();
+            Path2D b = new Path2D();
+            Path2D c = new Path2D();
 
-            a.add(new SegmentCurve(new Vector2(10, 50), new Vector2(60, 110)));
-            b.add(new QuadraticCurve(new Vector2(90, 50), new Vector2(110, 80), new Vector2(150, 50)));
-            c.add(new CubicCurve(new Vector2(180, 70), new Vector2(210, 100), new Vector2(250, 50), new Vector2(290, 110)));
+            a.add(new SegmentCurve(new Point2D(10, 50), new Point2D(60, 110)));
+            b.add(new QuadraticCurve(new Point2D(90, 50), new Point2D(110, 80), new Point2D(150, 50)));
+            c.add(new CubicCurve(new Point2D(180, 70), new Point2D(210, 100), new Point2D(250, 50), new Point2D(290, 110)));
 
             paths.add(a);
             paths.add(b);
             paths.add(c);
 
-            path = new CurvePath();
+            path = new Path2D();
         }
 
         @Override
@@ -69,7 +73,7 @@ public class Main extends Etyl {
             g.fillRect(0, 0, w, h);
 
             g.setColor(Color.CORN_FLOWER_BLUE);
-            for (CurvePath p : paths) {
+            for (Path2D p : paths) {
                 drawPath(g, p);
             }
 
@@ -81,7 +85,7 @@ public class Main extends Etyl {
                 if (path.size() >= 1) {
                     drawPath(g, path);
 
-                    //Vector2 lastPoint = path.getLastPoint();
+                    //Point2D lastPoint = path.getLastPoint();
                     //drawPoint(g, lastPoint);
                     //drawLine(g, lastPoint, mousePosition);
                 }
@@ -101,24 +105,24 @@ public class Main extends Etyl {
         boolean released = true;
         boolean isBezier = false;
 
-        Vector2 anchor = new Vector2();
-        Vector2 cp1 = new Vector2();
-        Vector2 cp2 = new Vector2();
+        Point2D anchor = new Point2D();
+        Point2D cp1 = new Point2D();
+        Point2D cp2 = new Point2D();
 
         @Override
         public void updateMouse(PointerEvent event) {
             super.updateMouse(event);
 
-            mousePosition.set(event.getX(), event.getY());
+            mousePosition.setLocation(event.getX(), event.getY());
 
             if (event.isButtonDown(MouseEvent.MOUSE_BUTTON_LEFT)) {
-                anchor = new Vector2(mousePosition);
+                anchor = new Point2D(mousePosition);
                 released = false;
 
             } else if (event.isButtonUp(MouseEvent.MOUSE_BUTTON_LEFT)) {
                 released = true;
 
-                Vector2 end = new Vector2(mousePosition);
+                Point2D end = new Point2D(mousePosition);
 
                 if (!path.isEmpty()) {
                     DataCurve curve = path.lastCurve();
@@ -135,7 +139,7 @@ public class Main extends Etyl {
                     } else {
                         if (path.size() == 1) {
                             path.removeLast();
-                            path.add(new QuadraticCurve(anchor, mousePosition, new Vector2(cp1)));
+                            path.add(new QuadraticCurve(anchor, mousePosition, new Point2D(cp1)));
                         } else {
                             if (curve.getType() == CurveType.CUBIC_BEZIER) {
                                 CubicCurve cubicCurve = (CubicCurve) curve;
@@ -149,18 +153,18 @@ public class Main extends Etyl {
                     path.add(new SegmentCurve(end, mousePosition));
                 }
 
-                cp1 = new Vector2();
-                cp2 = new Vector2();
+                cp1 = new Point2D();
+                cp2 = new Point2D();
                 isBezier = false;
             }
 
             if (!released) {
                 if (!isBezier && event.getState() == PointerState.DRAGGED) {
-                    cp1 = new Vector2();
-                    cp2 = new Vector2();
+                    cp1 = new Point2D();
+                    cp2 = new Point2D();
                     isBezier = true;
 
-                    Vector2 end = new Vector2(anchor);
+                    Point2D end = new Point2D(anchor);
 
                     if (!path.isEmpty()) {
                         DataCurve lastCurve = path.lastCurve();
@@ -187,9 +191,8 @@ public class Main extends Etyl {
                 }
 
                 if (isBezier) {
-                    // TODO Add control points based on anchor position
-                    cp1.set(mousePosition);
-                    cp2.set(anchor.x * 2 - cp1.x, anchor.y * 2 - cp1.y);
+                    cp1.setLocation(mousePosition.x, mousePosition.y);
+                    cp2.setLocation(anchor.x * 2 - cp1.x, anchor.y * 2 - cp1.y);
                 }
             }
         }
@@ -201,7 +204,7 @@ public class Main extends Etyl {
                 // Stop working with path
                 path.removeLast();
                 paths.add(path);
-                path = new CurvePath();
+                path = new Path2D();
             }
 
             if (event.isKeyUp(KeyEvent.VK_C)) {
@@ -209,7 +212,7 @@ public class Main extends Etyl {
             }
         }
 
-        private void drawPath(Graphics g, CurvePath path) {
+        private void drawPath(Graphics g, Path2D path) {
             for (DataCurve c : path.getCurves()) {
                 switch (c.getType()) {
                     case SEGMENT:
@@ -249,35 +252,35 @@ public class Main extends Etyl {
             }
         }
 
-        private void drawLine(Graphics g, Vector2 a, Vector2 b) {
-            g.drawLine(a.x, a.y, b.x, b.y);
+        private void drawLine(Graphics g, Point2D a, Point2D b) {
+            g.drawLine((int)a.x, (int)a.y, (int)b.x, (int)b.y);
         }
 
         private void drawCurve(Graphics g, Curve a) {
-            Vector2[] v = a.flattenCurve(16);
+            Point2D[] v = a.flattenCurve(16);
             drawCurve(g, v);
         }
 
-        private void drawCurve(Graphics g, Vector2[] list) {
+        private void drawCurve(Graphics g, Point2D[] list) {
             for (int i = 0; i < list.length - 1; i++) {
-                Vector2 v = list[i];
-                Vector2 n = list[i + 1];
-                g.drawLine(v.x, v.y, n.x, n.y);
+                Point2D v = list[i];
+                Point2D n = list[i + 1];
+                drawLine(g, v, n);
             }
         }
 
-        private void drawPoint(Graphics g, Vector2 point) {
+        private void drawPoint(Graphics g, Point2D point) {
             g.setColor(Color.WHITE);
-            g.fillRect(point.x - HALF_POINT_SIZE, point.y - HALF_POINT_SIZE, POINT_SIZE, POINT_SIZE);
+            g.fillRect((int)(point.x - HALF_POINT_SIZE), (int)(point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
             g.setColor(Color.CORN_FLOWER_BLUE);
             g.drawRect(point.x - HALF_POINT_SIZE, point.y - HALF_POINT_SIZE, POINT_SIZE, POINT_SIZE);
         }
 
-        private void drawLastPoint(Graphics g, Vector2 point) {
-            g.fillRect(point.x - HALF_POINT_SIZE, point.y - HALF_POINT_SIZE, POINT_SIZE, POINT_SIZE);
+        private void drawLastPoint(Graphics g, Point2D point) {
+            g.fillRect((int)(point.x - HALF_POINT_SIZE), (int)(point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
         }
 
-        private void drawControlPoint(Graphics g, Vector2 point) {
+        private void drawControlPoint(Graphics g, Point2D point) {
             g.fillCircle(point.x, point.y, HALF_POINT_SIZE);
         }
     }
