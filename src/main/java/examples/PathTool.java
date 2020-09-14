@@ -19,6 +19,8 @@ import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
 import com.harium.etyl.geometry.path.draw.BasePathDrawer;
 import com.harium.etyl.geometry.path.draw.PathDrawer;
+import com.harium.etyl.geometry.path.export.PathExporter;
+import com.harium.etyl.geometry.path.export.SVGExporter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class PathTool extends Etyl {
 
     public class PathToolApplication extends Application {
 
+        private PathExporter pathExporter = new SVGExporter();
         private PathDrawer pathDrawer = new BasePathDrawer();
 
         List<Path2D> paths = new ArrayList<>();
@@ -202,6 +205,8 @@ public class PathTool extends Etyl {
             }
         }
 
+        boolean keyCtrl = false;
+
         @Override
         public void updateKeyboard(KeyEvent event) {
             super.updateKeyboard(event);
@@ -214,6 +219,16 @@ public class PathTool extends Etyl {
 
             if (event.isKeyUp(KeyEvent.VK_C)) {
                 path.close();
+            }
+
+            if (event.isAnyKeyDown(KeyEvent.VK_CTRL_RIGHT)||event.isAnyKeyDown(KeyEvent.VK_CTRL_LEFT)) {
+                keyCtrl = true;
+            } else if (event.isAnyKeyUp(KeyEvent.VK_CTRL_RIGHT)||event.isAnyKeyDown(KeyEvent.VK_CTRL_LEFT)) {
+                keyCtrl = false;
+            }
+
+            if (keyCtrl && event.isKeyUp(KeyEvent.VK_S)) {
+                System.out.println(pathExporter.writeString(path));
             }
         }
 
