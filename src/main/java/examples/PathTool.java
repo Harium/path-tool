@@ -11,9 +11,14 @@ import com.harium.etyl.core.graphics.Graphics;
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
 import com.harium.etyl.geometry.curve.CubicBezier;
-import com.harium.etyl.geometry.curve.Curve;
 import com.harium.etyl.geometry.curve.QuadraticBezier;
-import com.harium.etyl.geometry.path.*;
+import com.harium.etyl.geometry.path.CubicCurve;
+import com.harium.etyl.geometry.path.CurveType;
+import com.harium.etyl.geometry.path.DataCurve;
+import com.harium.etyl.geometry.path.QuadraticCurve;
+import com.harium.etyl.geometry.path.SegmentCurve;
+import com.harium.etyl.geometry.path.draw.BasePathDrawer;
+import com.harium.etyl.geometry.path.draw.PathDrawer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,13 +37,12 @@ public class PathTool extends Etyl {
 
     @Override
     public Application startApplication() {
-        return new HelloWorld(w, h);
+        return new PathToolApplication(w, h);
     }
 
-    public class HelloWorld extends Application {
+    public class PathToolApplication extends Application {
 
-        private static final int POINT_SIZE = 6;
-        private static final int HALF_POINT_SIZE = POINT_SIZE / 2;
+        private PathDrawer pathDrawer = new BasePathDrawer();
 
         List<Path2D> paths = new ArrayList<>();
         // Current Path
@@ -46,7 +50,15 @@ public class PathTool extends Etyl {
 
         private Point2D mousePosition = new Point2D();
 
-        public HelloWorld(int w, int h) {
+        // Control variables
+        boolean released = true;
+        boolean isBezier = false;
+
+        Point2D anchor = new Point2D();
+        Point2D cp1 = new Point2D();
+        Point2D cp2 = new Point2D();
+
+        public PathToolApplication(int w, int h) {
             super(w, h);
         }
 
@@ -86,28 +98,21 @@ public class PathTool extends Etyl {
                     drawPath(g, path);
 
                     //Point2D lastPoint = path.getLastPoint();
-                    //drawPoint(g, lastPoint);
-                    //drawLine(g, lastPoint, mousePosition);
+                    //pathDrawer.drawPoint(g, lastPoint);
+                    //pathDrawer.drawLine(g, lastPoint, mousePosition);
                 }
 
                 if (isBezier) {
                     //g.setColor(Color.RED);
-                    drawLastPoint(g, anchor);
-                    drawLine(g, anchor, cp1);
-                    drawControlPoint(g, cp1);
+                    pathDrawer.drawLastPoint(g, anchor);
+                    pathDrawer.drawLine(g, anchor, cp1);
+                    pathDrawer.drawControlPoint(g, cp1);
                     //g.setColor(Color.BLUE);
-                    drawLine(g, anchor, cp2);
-                    drawControlPoint(g, cp2);
+                    pathDrawer.drawLine(g, anchor, cp2);
+                    pathDrawer.drawControlPoint(g, cp2);
                 }
             }
         }
-
-        boolean released = true;
-        boolean isBezier = false;
-
-        Point2D anchor = new Point2D();
-        Point2D cp1 = new Point2D();
-        Point2D cp2 = new Point2D();
 
         @Override
         public void updateMouse(PointerEvent event) {
@@ -216,72 +221,40 @@ public class PathTool extends Etyl {
             for (DataCurve c : path.getCurves()) {
                 switch (c.getType()) {
                     case SEGMENT:
-                        //drawLine(g, c.getData().getP0(), c.getData().getP1());
-                        drawCurve(g, c.getData());
-                        drawPoint(g, c.getStart());
-                        drawPoint(g, c.getEnd());
+                        //pathDrawer.drawLine(g, c.getData().getP0(), c.getData().getP1());
+                        pathDrawer.drawCurve(g, c.getData());
+                        pathDrawer.drawPoint(g, c.getStart());
+                        pathDrawer.drawPoint(g, c.getEnd());
                         break;
                     case QUADRATIC_BEZIER:
                         QuadraticBezier qCurve = (QuadraticBezier) c.getData();
-                        drawCurve(g, qCurve);
+                        pathDrawer.drawCurve(g, qCurve);
 
                         // Draw control points
-                        drawLine(g, qCurve.getP0(), qCurve.getP1());
-                        drawControlPoint(g, qCurve.getP1());
+                        pathDrawer.drawLine(g, qCurve.getP0(), qCurve.getP1());
+                        pathDrawer.drawControlPoint(g, qCurve.getP1());
                         // Start
-                        drawPoint(g, qCurve.getP0());
+                        pathDrawer.drawPoint(g, qCurve.getP0());
                         // End
-                        drawPoint(g, qCurve.getP2());
+                        pathDrawer.drawPoint(g, qCurve.getP2());
                         break;
                     case CUBIC_BEZIER:
                         CubicBezier cCurve = (CubicBezier) c.getData();
-                        drawCurve(g, cCurve);
+                        pathDrawer.drawCurve(g, cCurve);
 
                         // Draw control points
-                        drawLine(g, cCurve.getP2(), cCurve.getP3());
-                        drawLine(g, cCurve.getP0(), cCurve.getP1());
+                        pathDrawer.drawLine(g, cCurve.getP2(), cCurve.getP3());
+                        pathDrawer.drawLine(g, cCurve.getP0(), cCurve.getP1());
 
-                        drawControlPoint(g, cCurve.getP1());
-                        drawControlPoint(g, cCurve.getP2());
+                        pathDrawer.drawControlPoint(g, cCurve.getP1());
+                        pathDrawer.drawControlPoint(g, cCurve.getP2());
                         // Start
-                        drawPoint(g, cCurve.getP0());
+                        pathDrawer.drawPoint(g, cCurve.getP0());
                         // End
-                        drawPoint(g, cCurve.getP3());
+                        pathDrawer.drawPoint(g, cCurve.getP3());
                         break;
                 }
             }
-        }
-
-        private void drawLine(Graphics g, Point2D a, Point2D b) {
-            g.drawLine((int)a.x, (int)a.y, (int)b.x, (int)b.y);
-        }
-
-        private void drawCurve(Graphics g, Curve a) {
-            Point2D[] v = a.flattenCurve(16);
-            drawCurve(g, v);
-        }
-
-        private void drawCurve(Graphics g, Point2D[] list) {
-            for (int i = 0; i < list.length - 1; i++) {
-                Point2D v = list[i];
-                Point2D n = list[i + 1];
-                drawLine(g, v, n);
-            }
-        }
-
-        private void drawPoint(Graphics g, Point2D point) {
-            g.setColor(Color.WHITE);
-            g.fillRect((int)(point.x - HALF_POINT_SIZE), (int)(point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
-            g.setColor(Color.CORN_FLOWER_BLUE);
-            g.drawRect(point.x - HALF_POINT_SIZE, point.y - HALF_POINT_SIZE, POINT_SIZE, POINT_SIZE);
-        }
-
-        private void drawLastPoint(Graphics g, Point2D point) {
-            g.fillRect((int)(point.x - HALF_POINT_SIZE), (int)(point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
-        }
-
-        private void drawControlPoint(Graphics g, Point2D point) {
-            g.fillCircle(point.x, point.y, HALF_POINT_SIZE);
         }
     }
 }
