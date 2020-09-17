@@ -1,4 +1,4 @@
-package com.harium.etyl.geometry.path.export;
+package com.harium.etyl.geometry.path.exporter;
 
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
@@ -27,7 +27,7 @@ public class SVGExporterTest {
 
         String export = exporter.writeString(path);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-                             + "  <path fill=\"transparent\" stroke=\"black\" d=\"M 0.0 0.0 L 10.0 10.0 L 20.0 0.0 L 30.0 10.0 \"/>\n"
+                             + "  <path fill=\"none\" stroke=\"black\" d=\"M 0.0 0.0 L 10.0 10.0 L 20.0 0.0 L 30.0 10.0 \"/>\n"
                              + "</svg>", export);
     }
 
@@ -39,7 +39,7 @@ public class SVGExporterTest {
 
         String export = exporter.writeString(path);
         assertEquals("<svg width=\"20\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-                             + "  <path fill=\"transparent\" stroke=\"black\" d=\"M 0.0 0.0 Q 0.0 10.0 10.0 10.0 Q 20.0 10.0 20.0 0.0 \"/>\n"
+                             + "  <path fill=\"none\" stroke=\"black\" d=\"M 0.0 0.0 Q 0.0 10.0, 10.0 10.0 Q 20.0 10.0, 20.0 0.0 \"/>\n"
                              + "</svg>", export);
     }
 

@@ -1,4 +1,4 @@
-package com.harium.etyl.geometry.path.export;
+package com.harium.etyl.geometry.path.exporter;
 
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
@@ -9,15 +9,20 @@ import com.harium.etyl.geometry.path.SegmentCurve;
 
 public class SVGExporter implements PathExporter {
 
-    @Override
-    public String writeString(Path2D path) {
+    @Override public String writeString(Path2D path) {
+        return writeString(path, new PathOptions());
+    }
+
+    @Override public String writeString(Path2D path, PathOptions pathOptions) {
         StringBuilder builder = new StringBuilder();
 
         Point2D[] coordinates = calculateViewPort(path);
         addHeader(builder, coordinates[0], coordinates[1]);
 
-        openPath(builder, path);
-        appendCurves(builder, coordinates[0], path);
+        openPath(builder, pathOptions, path);
+
+        Point2D offset = new Point2D(-coordinates[0].x, -coordinates[0].y);
+        appendCurves(builder, offset, path);
         closePath(builder);
 
         addFooter(builder);
@@ -28,27 +33,27 @@ public class SVGExporter implements PathExporter {
         builder.append("/>\n");
     }
 
-    private void appendCurves(StringBuilder builder, Point2D min, Path2D path) {
+    private void appendCurves(StringBuilder builder, Point2D offset, Path2D path) {
         boolean isClosed = false;
 
         builder.append("d=\"");
 
-        appendFirstCurve(builder, min, path);
+        appendFirstCurve(builder, offset, path);
 
         for (DataCurve curve : path.getCurves()) {
             switch (curve.getType()) {
-                case SEGMENT:
-                    appendSegment(builder, min, (SegmentCurve) curve);
-                    break;
-                case QUADRATIC_BEZIER:
-                    appendQuadratic(builder, min, (QuadraticCurve) curve);
-                    break;
-                case CUBIC_BEZIER:
-                    appendCubic(builder, min, (CubicCurve) curve);
-                    break;
-                default:
-                    System.err.println("Type " + curve.getType() + " not handled");
-                    break;
+            case SEGMENT:
+                appendSegment(builder, offset, (SegmentCurve) curve);
+                break;
+            case QUADRATIC_BEZIER:
+                appendQuadratic(builder, offset, (QuadraticCurve) curve);
+                break;
+            case CUBIC_BEZIER:
+                appendCubic(builder, offset, (CubicCurve) curve);
+                break;
+            default:
+                System.err.println("Type " + curve.getType() + " not handled");
+                break;
             }
         }
         if (isClosed) {
@@ -61,54 +66,58 @@ public class SVGExporter implements PathExporter {
         DataCurve first = path.getCurves().get(0);
 
         builder.append("M ");
-        builder.append(first.getStart().x - min.x);
+        builder.append(first.getStart().x + min.x);
         builder.append(" ");
-        builder.append(first.getStart().y - min.y);
+        builder.append(first.getStart().y + min.y);
         builder.append(" ");
     }
 
-    private void openPath(StringBuilder builder, Path2D path) {
-        builder.append("\n  <path fill=\"transparent\" stroke=\"black\" ");
+    private void openPath(StringBuilder builder, PathOptions options, Path2D path) {
+        builder.append("\n  <path fill=\"");
+        builder.append(options.fill);
+        builder.append("\" stroke=\"");
+        builder.append(options.stroke);
+        builder.append("\" ");
     }
 
-    private void appendSegment(StringBuilder builder, Point2D min, SegmentCurve curve) {
+    private void appendSegment(StringBuilder builder, Point2D offset, SegmentCurve curve) {
         builder.append("L ");
-        builder.append(curve.getEnd().x - min.x);
+        builder.append(curve.getEnd().x + offset.x);
         builder.append(" ");
-        builder.append(curve.getEnd().y - min.y);
+        builder.append(curve.getEnd().y + offset.y);
         builder.append(" ");
     }
 
-    private void appendQuadratic(StringBuilder builder, Point2D min, QuadraticCurve curve) {
+    private void appendQuadratic(StringBuilder builder, Point2D offset, QuadraticCurve curve) {
         builder.append("Q ");
         // Control Point
-        builder.append(curve.getControl1().x - min.x);
+        builder.append(curve.getControl1().x + offset.x);
         builder.append(" ");
-        builder.append(curve.getControl1().y - min.y);
-        builder.append(" ");
+        builder.append(curve.getControl1().y + offset.y);
+        builder.append(", ");
         // End Point
-        builder.append(curve.getEnd().x - min.x);
+        builder.append(curve.getEnd().x + offset.x);
         builder.append(" ");
-        builder.append(curve.getEnd().y - min.y);
+        builder.append(curve.getEnd().y + offset.y);
         builder.append(" ");
     }
 
-    private void appendCubic(StringBuilder builder, Point2D min, CubicCurve curve) {
+    private void appendCubic(StringBuilder builder, Point2D offset, CubicCurve curve) {
         builder.append("C ");
         // Control Point 1
-        builder.append(curve.getControl1().x - min.x);
+        builder.append(curve.getControl1().x + offset.x);
         builder.append(" ");
-        builder.append(curve.getControl1().y - min.y);
-        builder.append(" ");
+        builder.append(curve.getControl1().y + offset.y);
+        builder.append(", ");
         // Control Point 2
-        builder.append(curve.getControl2().x - min.x);
+        builder.append(curve.getControl2().x + offset.x);
         builder.append(" ");
-        builder.append(curve.getControl2().y - min.y);
-        builder.append(" ");
+        builder.append(curve.getControl2().y + offset.y);
+        builder.append(", ");
         // End Point
-        builder.append(curve.getEnd().x - min.x);
+        builder.append(curve.getEnd().x + offset.x);
         builder.append(" ");
-        builder.append(curve.getEnd().y - min.y);
+        builder.append(curve.getEnd().y + offset.y);
         builder.append(" ");
     }
 
@@ -160,7 +169,7 @@ public class SVGExporter implements PathExporter {
             }
         }
 
-        return new Point2D[]{new Point2D(minX, minY), new Point2D(maxX, maxY)};
+        return new Point2D[] { new Point2D(minX, minY), new Point2D(maxX, maxY) };
     }
 
     private void addFooter(StringBuilder builder) {

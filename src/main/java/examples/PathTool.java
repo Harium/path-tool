@@ -19,13 +19,19 @@ import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
 import com.harium.etyl.geometry.path.draw.BasePathDrawer;
 import com.harium.etyl.geometry.path.draw.PathDrawer;
-import com.harium.etyl.geometry.path.export.PathExporter;
-import com.harium.etyl.geometry.path.export.SVGExporter;
+import com.harium.etyl.geometry.path.exporter.PathExporter;
+import com.harium.etyl.geometry.path.exporter.SVGExporter;
+import com.harium.etyl.geometry.path.importer.PathImporter;
+import com.harium.etyl.geometry.path.importer.SVGImporter;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PathTool extends Etyl {
+
+    private static final boolean DRAW_CONTROL_POINTS = true;
 
     public PathTool() {
         super(800, 600);
@@ -44,6 +50,7 @@ public class PathTool extends Etyl {
 
     public class PathToolApplication extends Application {
 
+        private PathImporter pathImporter = new SVGImporter();
         private PathExporter pathExporter = new SVGExporter();
         private PathDrawer pathDrawer = new BasePathDrawer();
 
@@ -67,18 +74,6 @@ public class PathTool extends Etyl {
 
         @Override
         public void load() {
-            Path2D a = new Path2D();
-            Path2D b = new Path2D();
-            Path2D c = new Path2D();
-
-            a.add(new SegmentCurve(new Point2D(10, 50), new Point2D(60, 110)));
-            b.add(new QuadraticCurve(new Point2D(90, 50), new Point2D(110, 80), new Point2D(150, 50)));
-            c.add(new CubicCurve(new Point2D(180, 70), new Point2D(210, 100), new Point2D(250, 50), new Point2D(290, 110)));
-
-            paths.add(a);
-            paths.add(b);
-            paths.add(c);
-
             path = new Path2D();
         }
 
@@ -126,12 +121,12 @@ public class PathTool extends Etyl {
             if (event.isButtonDown(MouseEvent.MOUSE_BUTTON_LEFT)) {
                 anchor = new Point2D(mousePosition);
                 released = false;
-
             } else if (event.isButtonUp(MouseEvent.MOUSE_BUTTON_LEFT)) {
                 released = true;
 
                 Point2D end = new Point2D(mousePosition);
 
+                // On release
                 if (!path.isEmpty()) {
                     DataCurve curve = path.lastCurve();
 
@@ -145,14 +140,19 @@ public class PathTool extends Etyl {
                             path.add(new QuadraticCurve(end, mousePosition, cubicCurve.getControl2()));
                         }
                     } else {
-                        if (path.size() == 1) {
+                        // The last curve is bezier
+                        if (path.size() <= 2) {
+                            // TODO This is buggy
                             path.removeLast();
                             path.add(new QuadraticCurve(anchor, mousePosition, new Point2D(cp1)));
+
                         } else {
                             if (curve.getType() == CurveType.CUBIC_BEZIER) {
+                                path.removeLast();
                                 CubicCurve cubicCurve = (CubicCurve) curve;
                                 path.add(new QuadraticCurve(curve.getEnd(), mousePosition, cubicCurve.getControl1()));
                             } else {
+                                path.removeLast();
                                 path.add(new SegmentCurve(curve.getEnd(), mousePosition));
                             }
                         }
@@ -168,6 +168,7 @@ public class PathTool extends Etyl {
 
             if (!released) {
                 if (!isBezier && event.getState() == PointerState.DRAGGED) {
+                    // First drag event
                     cp1 = new Point2D();
                     cp2 = new Point2D();
                     isBezier = true;
@@ -210,12 +211,6 @@ public class PathTool extends Etyl {
         @Override
         public void updateKeyboard(KeyEvent event) {
             super.updateKeyboard(event);
-            if (event.isKeyUp(KeyEvent.VK_ESC)) {
-                // Stop working with path
-                path.removeLast();
-                paths.add(path);
-                path = new Path2D();
-            }
 
             if (event.isKeyUp(KeyEvent.VK_C)) {
                 path.close();
@@ -227,8 +222,41 @@ public class PathTool extends Etyl {
                 keyCtrl = false;
             }
 
+            if (event.isKeyUp(KeyEvent.VK_ESC)) {
+                // Stop working with path
+                path.removeLast();
+                paths.add(path);
+                path = new Path2D();
+            }
+
+            if (keyCtrl && event.isKeyUp(KeyEvent.VK_Z)) {
+                undo();
+            }
+
             if (keyCtrl && event.isKeyUp(KeyEvent.VK_S)) {
+                if (path.getCurves().size() <= 1) {
+                    return;
+                }
+                Path2D copy = new Path2D();
+                copy.getCurves().addAll(path.getCurves());
+                copy.removeLast();
+
                 System.out.println(pathExporter.writeString(path));
+            }
+        }
+
+        private void undo() {
+            // Undo the last curve
+            path.removeLast();
+            if (!path.isEmpty()) {
+                DataCurve lastCurve = path.getCurves().get(path.getCurves().size() - 1);
+                if (lastCurve.getType() == CurveType.CUBIC_BEZIER) {
+                    path.removeLast();
+                    CubicCurve cubic = (CubicCurve) lastCurve;
+                    path.add(new QuadraticCurve(cubic.getStart(), mousePosition, cubic.getControl1()));
+                } else {
+                    lastCurve.setEnd(mousePosition);
+                }
             }
         }
 
@@ -246,8 +274,10 @@ public class PathTool extends Etyl {
                         pathDrawer.drawCurve(g, qCurve);
 
                         // Draw control points
-                        pathDrawer.drawLine(g, qCurve.getP0(), qCurve.getP1());
-                        pathDrawer.drawControlPoint(g, qCurve.getP1());
+                        if (DRAW_CONTROL_POINTS) {
+                            pathDrawer.drawLine(g, qCurve.getP0(), qCurve.getP1());
+                            pathDrawer.drawControlPoint(g, qCurve.getP1());
+                        }
                         // Start
                         pathDrawer.drawPoint(g, qCurve.getP0());
                         // End
@@ -257,17 +287,31 @@ public class PathTool extends Etyl {
                         CubicBezier cCurve = (CubicBezier) c.getData();
                         pathDrawer.drawCurve(g, cCurve);
 
-                        // Draw control points
-                        pathDrawer.drawLine(g, cCurve.getP2(), cCurve.getP3());
-                        pathDrawer.drawLine(g, cCurve.getP0(), cCurve.getP1());
+                        if (DRAW_CONTROL_POINTS) {
+                            // Draw control points
+                            pathDrawer.drawLine(g, cCurve.getP2(), cCurve.getP3());
+                            pathDrawer.drawLine(g, cCurve.getP0(), cCurve.getP1());
 
-                        pathDrawer.drawControlPoint(g, cCurve.getP1());
-                        pathDrawer.drawControlPoint(g, cCurve.getP2());
+                            pathDrawer.drawControlPoint(g, cCurve.getP1());
+                            pathDrawer.drawControlPoint(g, cCurve.getP2());
+                        }
                         // Start
                         pathDrawer.drawPoint(g, cCurve.getP0());
                         // End
                         pathDrawer.drawPoint(g, cCurve.getP3());
                         break;
+                }
+            }
+        }
+
+        @Override
+        public void dropFiles(int x, int y, List<File> files) {
+            for (File file : files) {
+                try {
+                    List<Path2D> paths = pathImporter.read(file);
+                    this.paths.addAll(paths);
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
         }
