@@ -54,19 +54,23 @@ public class PathTool extends Etyl {
         private PathExporter pathExporter = new SVGExporter();
         private PathDrawer pathDrawer = new BasePathDrawer();
 
-        List<Path2D> paths = new ArrayList<>();
+        private List<Path2D> paths = new ArrayList<>();
         // Current Path
         private Path2D path = new Path2D();
 
         private Point2D mousePosition = new Point2D();
 
         // Control variables
-        boolean released = true;
-        boolean isBezier = false;
+        private boolean keyCtrl = false;
+        private boolean released = true;
+        private boolean isBezier = false;
 
-        Point2D anchor = new Point2D();
-        Point2D cp1 = new Point2D();
-        Point2D cp2 = new Point2D();
+        private boolean mouseMiddle = false;
+        private int dragX, dragY;
+
+        private Point2D anchor = new Point2D();
+        private Point2D cp1 = new Point2D();
+        private Point2D cp2 = new Point2D();
 
         public PathToolApplication(int w, int h) {
             super(w, h);
@@ -117,6 +121,21 @@ public class PathTool extends Etyl {
             super.updateMouse(event);
 
             mousePosition.setLocation(event.getX(), event.getY());
+
+            if (!mouseMiddle) {
+                if (event.isButtonDown(MouseEvent.MOUSE_BUTTON_MIDDLE)) {
+                    mouseMiddle = true;
+                    dragX = event.getX() - pathDrawer.getX();
+                    dragY = event.getY() - pathDrawer.getY();
+                }
+            } else if (event.isButtonUp(MouseEvent.MOUSE_BUTTON_MIDDLE)) {
+                mouseMiddle = false;
+            } else {
+                // Move paths
+                int dx = event.getX() - dragX;
+                int dy = event.getY() - dragY;
+                pathDrawer.setOffset(dx, dy);
+            }
 
             if (event.isButtonDown(MouseEvent.MOUSE_BUTTON_LEFT)) {
                 anchor = new Point2D(mousePosition);
@@ -206,8 +225,6 @@ public class PathTool extends Etyl {
             }
         }
 
-        boolean keyCtrl = false;
-
         @Override
         public void updateKeyboard(KeyEvent event) {
             super.updateKeyboard(event);
@@ -223,10 +240,17 @@ public class PathTool extends Etyl {
             }
 
             if (event.isKeyUp(KeyEvent.VK_ESC)) {
-                // Stop working with path
-                path.removeLast();
-                paths.add(path);
-                path = new Path2D();
+                if (!keyCtrl && !path.getCurves().isEmpty()) {
+                    // Stop working with path
+                    path.removeLast();
+                    paths.add(path);
+                    path = new Path2D();
+                } else {
+                    // Clear all paths
+                    paths.clear();
+                    paths.add(path);
+                    path = new Path2D();
+                }
             }
 
             if (keyCtrl && event.isKeyUp(KeyEvent.VK_Z)) {
@@ -316,4 +340,5 @@ public class PathTool extends Etyl {
             }
         }
     }
+
 }

@@ -10,8 +10,11 @@ public class BasePathDrawer implements PathDrawer {
     private static final int POINT_SIZE = 6;
     private static final int HALF_POINT_SIZE = POINT_SIZE / 2;
 
+    private int x = 0;
+    private int y = 0;
+
     public void drawLine(Graphics g, Point2D a, Point2D b) {
-        g.drawLine((int)a.x, (int)a.y, (int)b.x, (int)b.y);
+        g.drawLine(x + (int) a.x, y + (int) a.y, x + (int) b.x, y + (int) b.y);
     }
 
     public void drawCurve(Graphics g, Curve a) {
@@ -29,17 +32,33 @@ public class BasePathDrawer implements PathDrawer {
 
     public void drawPoint(Graphics g, Point2D point) {
         g.setColor(Color.WHITE);
-        g.fillRect((int)(point.x - HALF_POINT_SIZE), (int)(point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
+        g.fillRect(x + (int) (point.x - HALF_POINT_SIZE), y + (int) (point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
         g.setColor(Color.CORN_FLOWER_BLUE);
-        g.drawRect(point.x - HALF_POINT_SIZE, point.y - HALF_POINT_SIZE, POINT_SIZE, POINT_SIZE);
+        g.drawRect(x + point.x - HALF_POINT_SIZE, y + point.y - HALF_POINT_SIZE, POINT_SIZE, POINT_SIZE);
     }
 
     public void drawLastPoint(Graphics g, Point2D point) {
-        g.fillRect((int)(point.x - HALF_POINT_SIZE), (int)(point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
+        g.fillRect(x + (int) (point.x - HALF_POINT_SIZE), y + (int) (point.y - HALF_POINT_SIZE), POINT_SIZE, POINT_SIZE);
     }
 
     public void drawControlPoint(Graphics g, Point2D point) {
-        g.fillCircle(point.x, point.y, HALF_POINT_SIZE);
+        g.fillCircle(x + point.x, y + point.y, HALF_POINT_SIZE);
+    }
+
+    @Override
+    public void setOffset(int x, int y) {
+        this.x = x;
+        this.y = y;
+    }
+
+    @Override
+    public int getX() {
+        return x;
+    }
+
+    @Override
+    public int getY() {
+        return y;
     }
 
 }
