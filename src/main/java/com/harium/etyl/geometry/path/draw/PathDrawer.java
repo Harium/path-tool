@@ -18,4 +18,9 @@ public interface PathDrawer {
 
     void drawControlPoint(Graphics g, Point2D point);
 
+    void setOffset(int x, int y);
+
+    int getX();
+
+    int getY();
 }
