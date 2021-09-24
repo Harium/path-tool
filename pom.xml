@@ -16,8 +16,8 @@
     </scm>
     <licenses>
         <license>
-            <name>GNU General Public License</name>
-            <url>http://www.gnu.org/licenses/gpl.txt</url>
+            <name>GNU Lesser General Public License</name>
+            <url>http://www.gnu.org/licenses/lgpl.txt</url>
         </license>
     </licenses>
     <dependencies>
@@ -25,11 +25,6 @@
             <groupId>com.harium.etyl</groupId>
             <artifactId>geometry</artifactId>
             <version>1.2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.harium.etyl</groupId>
-            <artifactId>etyl</artifactId>
-            <version>1.4.4</version>
         </dependency>
         <dependency>
             <groupId>gov.nist.math</groupId>
