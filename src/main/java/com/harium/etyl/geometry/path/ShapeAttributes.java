@@ -1,6 +1,6 @@
-package com.harium.etyl.geometry.path.exporter;
+package com.harium.etyl.geometry.path;
 
-public class PathAttributes {
+public class ShapeAttributes {
 
     public static final String COLOR_NONE = "none";
     public static final String COLOR_BLACK = "black";

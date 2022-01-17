@@ -1,4 +1,4 @@
-package com.harium.etyl.geometry.path.exporter;
+package com.harium.etyl.geometry.path.svg.exporter;
 
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
@@ -6,6 +6,8 @@ import com.harium.etyl.geometry.path.CubicCurve;
 import com.harium.etyl.geometry.path.DataCurve;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
+import com.harium.etyl.geometry.path.exporter.PathExporter;
+import com.harium.etyl.geometry.path.ShapeAttributes;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +30,7 @@ public class SVGExporter implements PathExporter {
     }
 
     @Override
-    public String writeString(List<Path2D> paths, List<PathAttributes> attributes) {
+    public String writeString(List<Path2D> paths, List<ShapeAttributes> attributes) {
         StringBuilder builder = new StringBuilder();
 
         Point2D[] coordinates = calculateViewPort(paths);
@@ -36,7 +38,7 @@ public class SVGExporter implements PathExporter {
 
         for (int i = 0; i < paths.size(); i++) {
             Path2D path = paths.get(i);
-            PathAttributes attr = attributes.get(i);
+            ShapeAttributes attr = attributes.get(i);
             exportSinglePath(path, attr, builder, coordinates);
         }
 
@@ -46,11 +48,11 @@ public class SVGExporter implements PathExporter {
 
     @Override
     public String writeString(Path2D path) {
-        return writeString(path, new PathAttributes());
+        return writeString(path, new ShapeAttributes());
     }
 
     @Override
-    public String writeString(Path2D path, PathAttributes pathOptions) {
+    public String writeString(Path2D path, ShapeAttributes pathOptions) {
         StringBuilder builder = new StringBuilder();
 
         Point2D[] coordinates = calculateViewPort(Collections.singletonList(path));
@@ -62,8 +64,8 @@ public class SVGExporter implements PathExporter {
         return builder.toString();
     }
 
-    private void exportSinglePath(Path2D path, PathAttributes pathAttributes, StringBuilder builder, Point2D[] coordinates) {
-        openPath(builder, pathAttributes, path);
+    private void exportSinglePath(Path2D path, ShapeAttributes shapeAttributes, StringBuilder builder, Point2D[] coordinates) {
+        openPath(builder, shapeAttributes, path);
         Point2D offset = new Point2D(-coordinates[0].x, -coordinates[0].y);
         appendCurves(builder, offset, path);
         closePath(builder);
@@ -112,7 +114,7 @@ public class SVGExporter implements PathExporter {
         builder.append(" ");
     }
 
-    private void openPath(StringBuilder builder, PathAttributes attributes, Path2D path) {
+    private void openPath(StringBuilder builder, ShapeAttributes attributes, Path2D path) {
         builder.append("\n  <path");
         if (attributes != null) {
             appendStyleAttr(builder, "id", attributes.id);

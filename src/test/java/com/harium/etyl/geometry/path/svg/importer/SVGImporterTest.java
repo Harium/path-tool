@@ -1,4 +1,4 @@
-package com.harium.etyl.geometry.path.importer;
+package com.harium.etyl.geometry.path.svg.importer;
 
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
@@ -23,14 +23,6 @@ public class SVGImporterTest {
     @Before
     public void setUp() {
         importer = new SVGImporter();
-    }
-
-    @Test
-    public void testCleanData() {
-        assertEquals("1 2", importer.cleanData("1, 2"));
-        assertEquals("3 4", importer.cleanData("3,  4"));
-        assertEquals("1 2 3 4 5 6", importer.cleanData("1 2,  3 4 , 5 6"));
-        assertEquals("1 2 3 4 5 6", importer.cleanData(" 1 2  ,  3 4 ,5  6 "));
     }
 
     @Test

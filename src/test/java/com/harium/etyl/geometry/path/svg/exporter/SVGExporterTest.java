@@ -1,9 +1,11 @@
-package com.harium.etyl.geometry.path.exporter;
+package com.harium.etyl.geometry.path.svg.exporter;
 
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
+import com.harium.etyl.geometry.path.ShapeAttributes;
+import com.harium.etyl.geometry.path.exporter.PathExporter;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,14 +43,14 @@ public class SVGExporterTest {
         path.add(new SegmentCurve(new Point2D(10, 10), new Point2D(20, 0)));
         path.add(new SegmentCurve(new Point2D(20, 0), new Point2D(30, 10)));
 
-        PathAttributes defaultStyle = new PathAttributes();
+        ShapeAttributes defaultStyle = new ShapeAttributes();
         defaultStyle.id = "my-path";
-        defaultStyle.fill = PathAttributes.COLOR_NONE;
-        defaultStyle.stroke = PathAttributes.COLOR_BLACK;
-        defaultStyle.strokeWidth = PathAttributes.DEFAULT_WIDTH;
-        defaultStyle.strokeLineCap = PathAttributes.DEFAULT_LINECAP;
-        defaultStyle.strokeLineJoin = PathAttributes.DEFAULT_LINEJOIN;
-        defaultStyle.strokeOpacity = PathAttributes.DEFAULT_OPACITY;
+        defaultStyle.fill = ShapeAttributes.COLOR_NONE;
+        defaultStyle.stroke = ShapeAttributes.COLOR_BLACK;
+        defaultStyle.strokeWidth = ShapeAttributes.DEFAULT_WIDTH;
+        defaultStyle.strokeLineCap = ShapeAttributes.DEFAULT_LINECAP;
+        defaultStyle.strokeLineJoin = ShapeAttributes.DEFAULT_LINEJOIN;
+        defaultStyle.strokeOpacity = ShapeAttributes.DEFAULT_OPACITY;
 
         String export = exporter.writeString(path, defaultStyle);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
@@ -84,15 +86,15 @@ public class SVGExporterTest {
         paths.add(path2);
         paths.add(path3);
 
-        PathAttributes defaultStyle = new PathAttributes();
-        defaultStyle.fill = PathAttributes.COLOR_NONE;
-        defaultStyle.stroke = PathAttributes.COLOR_BLACK;
-        defaultStyle.strokeWidth = PathAttributes.DEFAULT_WIDTH;
-        defaultStyle.strokeLineCap = PathAttributes.DEFAULT_LINECAP;
-        defaultStyle.strokeLineJoin = PathAttributes.DEFAULT_LINEJOIN;
-        defaultStyle.strokeOpacity = PathAttributes.DEFAULT_OPACITY;
+        ShapeAttributes defaultStyle = new ShapeAttributes();
+        defaultStyle.fill = ShapeAttributes.COLOR_NONE;
+        defaultStyle.stroke = ShapeAttributes.COLOR_BLACK;
+        defaultStyle.strokeWidth = ShapeAttributes.DEFAULT_WIDTH;
+        defaultStyle.strokeLineCap = ShapeAttributes.DEFAULT_LINECAP;
+        defaultStyle.strokeLineJoin = ShapeAttributes.DEFAULT_LINEJOIN;
+        defaultStyle.strokeOpacity = ShapeAttributes.DEFAULT_OPACITY;
 
-        List<PathAttributes> attributes = new ArrayList<>();
+        List<ShapeAttributes> attributes = new ArrayList<>();
         attributes.add(defaultStyle);
         attributes.add(defaultStyle);
         attributes.add(defaultStyle);

@@ -1,4 +1,4 @@
-package com.harium.etyl.geometry.path.importer;
+package com.harium.etyl.geometry.path.svg.importer;
 
 import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
@@ -7,21 +7,11 @@ import com.harium.etyl.geometry.path.CurveType;
 import com.harium.etyl.geometry.path.DataCurve;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SVGImporter implements PathImporter {
+public class SVGPathParser {
 
     private static final double EPSILON = 0.0001d;
 
@@ -41,49 +31,7 @@ public class SVGImporter implements PathImporter {
     private static final String SHORTHAND_CUBIC_ABSOLUTE = "S";
     private static final String SHORTHAND_CUBIC_RELATIVE = "s";
 
-    @Override
-    public List<Path2D> read(String data) {
-        List<Path2D> list = new ArrayList<>();
-
-        Document doc = Jsoup.parse(data);
-        // Parse paths only
-        Elements pathElements = doc.getElementsByTag("path");
-        for (Element element: pathElements) {
-            String d = element.attr("d");
-            List<Path2D> paths = parseData(d);
-            list.addAll(paths);
-        }
-
-        return list;
-    }
-
-    @Override
-    public List<Path2D> read(File file) throws IOException {
-        StringBuilder sb;
-        BufferedReader buf = null;
-        try {
-            InputStream is = new FileInputStream(file);
-            buf = new BufferedReader(new InputStreamReader(is));
-
-            String line = buf.readLine();
-            sb = new StringBuilder();
-
-            while (line != null) {
-                sb.append(line).append("\n");
-                line = buf.readLine();
-            }
-        } finally {
-            if (buf != null) {
-                buf.close();
-            }
-        }
-
-        String data = sb.toString();
-        return read(data);
-    }
-
-
-    private List<Path2D> parseData(String d) {
+    public List<Path2D> parseData(String d) {
         List<Path2D> paths = new ArrayList<>();
 
         String data = cleanData(d);
