@@ -7,30 +7,70 @@ import com.harium.etyl.geometry.path.DataCurve;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
 
+import java.util.Collections;
+import java.util.List;
+
 public class SVGExporter implements PathExporter {
 
-    @Override public String writeString(Path2D path) {
-        return writeString(path, new PathOptions());
-    }
-
-    @Override public String writeString(Path2D path, PathOptions pathOptions) {
+    @Override
+    public String writeString(List<Path2D> paths) {
         StringBuilder builder = new StringBuilder();
 
-        Point2D[] coordinates = calculateViewPort(path);
+        Point2D[] coordinates = calculateViewPort(paths);
         addHeader(builder, coordinates[0], coordinates[1]);
 
-        openPath(builder, pathOptions, path);
-
-        Point2D offset = new Point2D(-coordinates[0].x, -coordinates[0].y);
-        appendCurves(builder, offset, path);
-        closePath(builder);
+        for (Path2D path : paths) {
+            exportSinglePath(path, null, builder, coordinates);
+        }
 
         addFooter(builder);
         return builder.toString();
     }
 
+    @Override
+    public String writeString(List<Path2D> paths, List<PathAttributes> attributes) {
+        StringBuilder builder = new StringBuilder();
+
+        Point2D[] coordinates = calculateViewPort(paths);
+        addHeader(builder, coordinates[0], coordinates[1]);
+
+        for (int i = 0; i < paths.size(); i++) {
+            Path2D path = paths.get(i);
+            PathAttributes attr = attributes.get(i);
+            exportSinglePath(path, attr, builder, coordinates);
+        }
+
+        addFooter(builder);
+        return builder.toString();
+    }
+
+    @Override
+    public String writeString(Path2D path) {
+        return writeString(path, new PathAttributes());
+    }
+
+    @Override
+    public String writeString(Path2D path, PathAttributes pathOptions) {
+        StringBuilder builder = new StringBuilder();
+
+        Point2D[] coordinates = calculateViewPort(Collections.singletonList(path));
+        addHeader(builder, coordinates[0], coordinates[1]);
+
+        exportSinglePath(path, pathOptions, builder, coordinates);
+
+        addFooter(builder);
+        return builder.toString();
+    }
+
+    private void exportSinglePath(Path2D path, PathAttributes pathAttributes, StringBuilder builder, Point2D[] coordinates) {
+        openPath(builder, pathAttributes, path);
+        Point2D offset = new Point2D(-coordinates[0].x, -coordinates[0].y);
+        appendCurves(builder, offset, path);
+        closePath(builder);
+    }
+
     private void closePath(StringBuilder builder) {
-        builder.append("/>\n");
+        builder.append("/>");
     }
 
     private void appendCurves(StringBuilder builder, Point2D offset, Path2D path) {
@@ -72,12 +112,30 @@ public class SVGExporter implements PathExporter {
         builder.append(" ");
     }
 
-    private void openPath(StringBuilder builder, PathOptions options, Path2D path) {
-        builder.append("\n  <path fill=\"");
-        builder.append(options.fill);
-        builder.append("\" stroke=\"");
-        builder.append(options.stroke);
-        builder.append("\" ");
+    private void openPath(StringBuilder builder, PathAttributes attributes, Path2D path) {
+        builder.append("\n  <path");
+        if (attributes != null) {
+            appendStyleAttr(builder, "id", attributes.id);
+            appendStyleAttr(builder, "fill", attributes.fill);
+            appendStyleAttr(builder, "stroke", attributes.stroke);
+            appendStyleAttr(builder, "stroke-width", attributes.strokeWidth);
+            appendStyleAttr(builder, "stroke-linecap", attributes.strokeLineCap);
+            appendStyleAttr(builder, "stroke-linejoin", attributes.strokeLineJoin);
+            appendStyleAttr(builder, "stroke-opacity", attributes.strokeOpacity);
+        }
+        builder.append(" ");
+    }
+
+    private void appendStyleAttr(StringBuilder builder, String attribute, String value) {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+
+        builder.append(" ");
+        builder.append(attribute);
+        builder.append("=\"");
+        builder.append(value);
+        builder.append("\"");
     }
 
     private void appendSegment(StringBuilder builder, Point2D offset, SegmentCurve curve) {
@@ -132,40 +190,42 @@ public class SVGExporter implements PathExporter {
         builder.append("\" xmlns=\"http://www.w3.org/2000/svg\">");
     }
 
-    private Point2D[] calculateViewPort(Path2D path) {
+    private Point2D[] calculateViewPort(List<Path2D> paths) {
         float minX = Float.MAX_VALUE;
         float maxX = Float.MIN_VALUE;
         float minY = Float.MAX_VALUE;
         float maxY = Float.MIN_VALUE;
 
-        for (DataCurve curve : path.getCurves()) {
-            Point2D start = curve.getStart();
-            Point2D end = curve.getEnd();
-            // Start
-            if (start.x < minX) {
-                minX = (int) start.x;
-            }
-            if (start.x > maxX) {
-                maxX = (int) start.x;
-            }
-            if (start.y < minY) {
-                minY = (int) start.y;
-            }
-            if (start.y > maxY) {
-                maxY = (int) start.y;
-            }
-            // End
-            if (end.x < minX) {
-                minX = (int) end.x;
-            }
-            if (end.x > maxX) {
-                maxX = (int) end.x;
-            }
-            if (end.y < minY) {
-                minY = (int) end.y;
-            }
-            if (end.y > maxY) {
-                maxY = (int) end.y;
+        for (Path2D path : paths) {
+            for (DataCurve curve : path.getCurves()) {
+                Point2D start = curve.getStart();
+                Point2D end = curve.getEnd();
+                // Start
+                if (start.x < minX) {
+                    minX = (int) start.x;
+                }
+                if (start.x > maxX) {
+                    maxX = (int) start.x;
+                }
+                if (start.y < minY) {
+                    minY = (int) start.y;
+                }
+                if (start.y > maxY) {
+                    maxY = (int) start.y;
+                }
+                // End
+                if (end.x < minX) {
+                    minX = (int) end.x;
+                }
+                if (end.x > maxX) {
+                    maxX = (int) end.x;
+                }
+                if (end.y < minY) {
+                    minY = (int) end.y;
+                }
+                if (end.y > maxY) {
+                    maxY = (int) end.y;
+                }
             }
         }
 
@@ -173,6 +233,6 @@ public class SVGExporter implements PathExporter {
     }
 
     private void addFooter(StringBuilder builder) {
-        builder.append("</svg>");
+        builder.append("\n</svg>");
     }
 }
