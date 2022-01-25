@@ -117,18 +117,19 @@ public class SVGExporter implements PathExporter {
     private void openPath(StringBuilder builder, ShapeAttributes attributes, Path2D path) {
         builder.append("\n  <path");
         if (attributes != null) {
-            appendStyleAttr(builder, "id", attributes.id);
-            appendStyleAttr(builder, "fill", attributes.fill);
-            appendStyleAttr(builder, "stroke", attributes.stroke);
-            appendStyleAttr(builder, "stroke-width", attributes.strokeWidth);
-            appendStyleAttr(builder, "stroke-linecap", attributes.strokeLineCap);
-            appendStyleAttr(builder, "stroke-linejoin", attributes.strokeLineJoin);
-            appendStyleAttr(builder, "stroke-opacity", attributes.strokeOpacity);
+            appendStyleAttr(builder, "id", attributes);
+            appendStyleAttr(builder, "fill", attributes);
+            appendStyleAttr(builder, "stroke", attributes);
+            appendStyleAttr(builder, "stroke-width", attributes);
+            appendStyleAttr(builder, "stroke-linecap", attributes);
+            appendStyleAttr(builder, "stroke-linejoin", attributes);
+            appendStyleAttr(builder, "stroke-opacity", attributes);
         }
         builder.append(" ");
     }
 
-    private void appendStyleAttr(StringBuilder builder, String attribute, String value) {
+    private void appendStyleAttr(StringBuilder builder, String attribute, ShapeAttributes attributeMap) {
+        String value = attributeMap.get(attribute);
         if (value == null || value.isEmpty()) {
             return;
         }

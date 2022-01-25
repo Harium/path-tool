@@ -44,13 +44,13 @@ public class SVGExporterTest {
         path.add(new SegmentCurve(new Point2D(20, 0), new Point2D(30, 10)));
 
         ShapeAttributes defaultStyle = new ShapeAttributes();
-        defaultStyle.id = "my-path";
-        defaultStyle.fill = ShapeAttributes.COLOR_NONE;
-        defaultStyle.stroke = ShapeAttributes.COLOR_BLACK;
-        defaultStyle.strokeWidth = ShapeAttributes.DEFAULT_WIDTH;
-        defaultStyle.strokeLineCap = ShapeAttributes.DEFAULT_LINECAP;
-        defaultStyle.strokeLineJoin = ShapeAttributes.DEFAULT_LINEJOIN;
-        defaultStyle.strokeOpacity = ShapeAttributes.DEFAULT_OPACITY;
+        defaultStyle.setId("my-path");
+        defaultStyle.setFill(ShapeAttributes.COLOR_NONE);
+        defaultStyle.setStroke(ShapeAttributes.COLOR_BLACK);
+        defaultStyle.setStrokeWidth(ShapeAttributes.DEFAULT_WIDTH);
+        defaultStyle.setStrokeLineCap(ShapeAttributes.DEFAULT_LINECAP);
+        defaultStyle.setStrokeLineJoin(ShapeAttributes.DEFAULT_LINEJOIN);
+        defaultStyle.setStrokeOpacity(ShapeAttributes.DEFAULT_OPACITY);
 
         String export = exporter.writeString(path, defaultStyle);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
@@ -87,12 +87,12 @@ public class SVGExporterTest {
         paths.add(path3);
 
         ShapeAttributes defaultStyle = new ShapeAttributes();
-        defaultStyle.fill = ShapeAttributes.COLOR_NONE;
-        defaultStyle.stroke = ShapeAttributes.COLOR_BLACK;
-        defaultStyle.strokeWidth = ShapeAttributes.DEFAULT_WIDTH;
-        defaultStyle.strokeLineCap = ShapeAttributes.DEFAULT_LINECAP;
-        defaultStyle.strokeLineJoin = ShapeAttributes.DEFAULT_LINEJOIN;
-        defaultStyle.strokeOpacity = ShapeAttributes.DEFAULT_OPACITY;
+        defaultStyle.setFill(ShapeAttributes.COLOR_NONE);
+        defaultStyle.setStroke(ShapeAttributes.COLOR_BLACK);
+        defaultStyle.setStrokeWidth(ShapeAttributes.DEFAULT_WIDTH);
+        defaultStyle.setStrokeLineCap(ShapeAttributes.DEFAULT_LINECAP);
+        defaultStyle.setStrokeLineJoin(ShapeAttributes.DEFAULT_LINEJOIN);
+        defaultStyle.setStrokeOpacity(ShapeAttributes.DEFAULT_OPACITY);
 
         List<ShapeAttributes> attributes = new ArrayList<>();
         attributes.add(defaultStyle);
