@@ -1,6 +1,6 @@
 package com.harium.etyl.geometry.path;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ElementAttributes {
@@ -20,7 +20,7 @@ public class ElementAttributes {
     public static final String DEFAULT_LINECAP = "butt";
     public static final String DEFAULT_LINEJOIN = "miter";
 
-    private Map<String, String> attributes = new HashMap<>();
+    public Map<String, String> map = new LinkedHashMap<>();
 
     public ElementAttributes() {
 
@@ -31,15 +31,15 @@ public class ElementAttributes {
     }
 
     public ElementAttributes copy(ElementAttributes attributes) {
-        if (attributes.attributes == null) {
+        if (attributes.map == null) {
             return this;
         }
-        this.attributes.putAll(attributes.attributes);
+        this.map.putAll(attributes.map);
         return this;
     }
 
     public String get(String attribute) {
-        String value = this.attributes.get(attribute);
+        String value = this.map.get(attribute);
         if (value == null) {
             return "";
         }
@@ -47,7 +47,7 @@ public class ElementAttributes {
     }
 
     public void set(String attribute, String value) {
-        this.attributes.put(attribute, value);
+        this.map.put(attribute, value);
     }
 
     public ElementAttributes id(String id) {

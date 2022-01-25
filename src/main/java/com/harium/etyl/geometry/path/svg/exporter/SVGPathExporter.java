@@ -6,30 +6,10 @@ import com.harium.etyl.geometry.path.CubicCurve;
 import com.harium.etyl.geometry.path.DataCurve;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
-import com.harium.etyl.geometry.path.ElementAttributes;
 
 import java.util.List;
 
 public class SVGPathExporter {
-
-    public void openPath(StringBuilder builder, ElementAttributes attributes) {
-        builder.append("\n  <path");
-        if (attributes != null) {
-            appendStyleAttr(builder, "id", attributes);
-            appendStyleAttr(builder, "fill", attributes);
-            appendStyleAttr(builder, "stroke", attributes);
-            appendStyleAttr(builder, "stroke-width", attributes);
-            appendStyleAttr(builder, "stroke-linecap", attributes);
-            appendStyleAttr(builder, "stroke-linejoin", attributes);
-            appendStyleAttr(builder, "stroke-opacity", attributes);
-        }
-        builder.append(" ");
-    }
-
-
-    public void closePath(StringBuilder builder) {
-        builder.append("/>");
-    }
 
     public void appendPath(StringBuilder builder, Path2D path) {
         appendPath(builder, new Point2D(0, 0), path);
@@ -89,19 +69,6 @@ public class SVGPathExporter {
         builder.append(" ");
         builder.append(first.getStart().y + offset.y);
         builder.append(" ");
-    }
-
-    private void appendStyleAttr(StringBuilder builder, String attribute, ElementAttributes attributeMap) {
-        String value = attributeMap.get(attribute);
-        if (value == null || value.isEmpty()) {
-            return;
-        }
-
-        builder.append(" ");
-        builder.append(attribute);
-        builder.append("=\"");
-        builder.append(value);
-        builder.append("\"");
     }
 
     private void appendSegment(StringBuilder builder, Point2D offset, SegmentCurve curve) {
