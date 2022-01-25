@@ -4,7 +4,7 @@ import com.harium.etyl.geometry.Path2D;
 import com.harium.etyl.geometry.Point2D;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
-import com.harium.etyl.geometry.path.ShapeAttributes;
+import com.harium.etyl.geometry.path.ElementAttributes;
 import com.harium.etyl.geometry.path.exporter.PathExporter;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,14 +43,14 @@ public class SVGExporterTest {
         path.add(new SegmentCurve(new Point2D(10, 10), new Point2D(20, 0)));
         path.add(new SegmentCurve(new Point2D(20, 0), new Point2D(30, 10)));
 
-        ShapeAttributes defaultStyle = new ShapeAttributes();
-        defaultStyle.setId("my-path");
-        defaultStyle.setFill(ShapeAttributes.COLOR_NONE);
-        defaultStyle.setStroke(ShapeAttributes.COLOR_BLACK);
-        defaultStyle.setStrokeWidth(ShapeAttributes.DEFAULT_WIDTH);
-        defaultStyle.setStrokeLineCap(ShapeAttributes.DEFAULT_LINECAP);
-        defaultStyle.setStrokeLineJoin(ShapeAttributes.DEFAULT_LINEJOIN);
-        defaultStyle.setStrokeOpacity(ShapeAttributes.DEFAULT_OPACITY);
+        ElementAttributes defaultStyle = new ElementAttributes();
+        defaultStyle.id("my-path");
+        defaultStyle.fill(ElementAttributes.COLOR_NONE);
+        defaultStyle.stroke(ElementAttributes.COLOR_BLACK);
+        defaultStyle.strokeWidth(ElementAttributes.DEFAULT_WIDTH);
+        defaultStyle.strokeLineCap(ElementAttributes.DEFAULT_LINECAP);
+        defaultStyle.strokeLineJoin(ElementAttributes.DEFAULT_LINEJOIN);
+        defaultStyle.strokeOpacity(ElementAttributes.DEFAULT_OPACITY);
 
         String export = exporter.writeString(path, defaultStyle);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
@@ -86,15 +86,15 @@ public class SVGExporterTest {
         paths.add(path2);
         paths.add(path3);
 
-        ShapeAttributes defaultStyle = new ShapeAttributes();
-        defaultStyle.setFill(ShapeAttributes.COLOR_NONE);
-        defaultStyle.setStroke(ShapeAttributes.COLOR_BLACK);
-        defaultStyle.setStrokeWidth(ShapeAttributes.DEFAULT_WIDTH);
-        defaultStyle.setStrokeLineCap(ShapeAttributes.DEFAULT_LINECAP);
-        defaultStyle.setStrokeLineJoin(ShapeAttributes.DEFAULT_LINEJOIN);
-        defaultStyle.setStrokeOpacity(ShapeAttributes.DEFAULT_OPACITY);
+        ElementAttributes defaultStyle = new ElementAttributes();
+        defaultStyle.fill(ElementAttributes.COLOR_NONE);
+        defaultStyle.stroke(ElementAttributes.COLOR_BLACK);
+        defaultStyle.strokeWidth(ElementAttributes.DEFAULT_WIDTH);
+        defaultStyle.strokeLineCap(ElementAttributes.DEFAULT_LINECAP);
+        defaultStyle.strokeLineJoin(ElementAttributes.DEFAULT_LINEJOIN);
+        defaultStyle.strokeOpacity(ElementAttributes.DEFAULT_OPACITY);
 
-        List<ShapeAttributes> attributes = new ArrayList<>();
+        List<ElementAttributes> attributes = new ArrayList<>();
         attributes.add(defaultStyle);
         attributes.add(defaultStyle);
         attributes.add(defaultStyle);

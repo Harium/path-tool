@@ -7,8 +7,6 @@ import com.harium.etyl.geometry.path.CurveType;
 import com.harium.etyl.geometry.path.DataCurve;
 import com.harium.etyl.geometry.path.QuadraticCurve;
 import com.harium.etyl.geometry.path.SegmentCurve;
-import com.harium.etyl.geometry.path.ShapeAttributes;
-import org.jsoup.nodes.Attributes;
 
 import java.util.ArrayList;
 import java.util.List;

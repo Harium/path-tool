@@ -3,7 +3,7 @@ package com.harium.etyl.geometry.path;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ShapeAttributes {
+public class ElementAttributes {
 
     public static final String ATTR_ID = "id";
     public static final String ATTR_FILL = "fill";
@@ -22,31 +22,37 @@ public class ShapeAttributes {
 
     private Map<String, String> attributes = new HashMap<>();
 
-    public ShapeAttributes() {
+    public ElementAttributes() {
 
     }
 
-    public ShapeAttributes(ShapeAttributes attributes) {
+    public ElementAttributes(ElementAttributes attributes) {
         this.copy(attributes);
     }
 
-    private void copy(ShapeAttributes attributes) {
+    public ElementAttributes copy(ElementAttributes attributes) {
         if (attributes.attributes == null) {
-            return;
+            return this;
         }
         this.attributes.putAll(attributes.attributes);
+        return this;
     }
 
     public String get(String attribute) {
-        return this.attributes.get(attribute);
+        String value = this.attributes.get(attribute);
+        if (value == null) {
+            return "";
+        }
+        return value;
     }
 
     public void set(String attribute, String value) {
         this.attributes.put(attribute, value);
     }
 
-    public void setId(String id) {
+    public ElementAttributes id(String id) {
         set(ATTR_ID, id);
+        return this;
     }
 
     public String getId() {
@@ -57,47 +63,53 @@ public class ShapeAttributes {
         return get(ATTR_FILL);
     }
 
-    public void setFill(String fill) {
+    public ElementAttributes fill(String fill) {
         set(ATTR_FILL, fill);
+        return this;
     }
 
     public String getStroke() {
         return get(ATTR_STROKE);
     }
 
-    public void setStroke(String stroke) {
+    public ElementAttributes stroke(String stroke) {
         set(ATTR_STROKE, stroke);
+        return this;
     }
 
     public String getStrokeWidth() {
         return get(ATTR_STROKE_WIDTH);
     }
 
-    public void setStrokeWidth(String strokeWidth) {
+    public ElementAttributes strokeWidth(String strokeWidth) {
         set(ATTR_STROKE_WIDTH, strokeWidth);
+        return this;
     }
 
     public String getStrokeLineCap() {
         return get(ATTR_STROKE_LINECAP);
     }
 
-    public void setStrokeLineCap(String strokeLineCap) {
+    public ElementAttributes strokeLineCap(String strokeLineCap) {
         set(ATTR_STROKE_LINECAP, strokeLineCap);
+        return this;
     }
 
     public String getStrokeLineJoin() {
         return get(ATTR_STROKE_LINEJOIN);
     }
 
-    public void setStrokeLineJoin(String strokeLineJoin) {
+    public ElementAttributes strokeLineJoin(String strokeLineJoin) {
         set(ATTR_STROKE_LINEJOIN, strokeLineJoin);
+        return this;
     }
 
     public String getStrokeOpacity() {
         return get(ATTR_STROKE_OPACITY);
     }
 
-    public void setStrokeOpacity(String strokeOpacity) {
+    public ElementAttributes strokeOpacity(String strokeOpacity) {
         set(ATTR_STROKE_OPACITY, strokeOpacity);
+        return this;
     }
 }
