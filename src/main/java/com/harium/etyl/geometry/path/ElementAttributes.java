@@ -34,6 +34,7 @@ public class ElementAttributes {
         if (attributes.map == null) {
             return this;
         }
+        this.map.clear();
         this.map.putAll(attributes.map);
         return this;
     }

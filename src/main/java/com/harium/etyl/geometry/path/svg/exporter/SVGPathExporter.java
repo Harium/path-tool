@@ -11,22 +11,23 @@ import java.util.List;
 
 public class SVGPathExporter {
 
-    public void appendPath(StringBuilder builder, Path2D path) {
-        appendPath(builder, new Point2D(0, 0), path);
+    public String exportPath(Path2D path) {
+        return exportPath(new Point2D(0, 0), path);
     }
 
-    public void appendPath(StringBuilder builder, Point2D offset, Path2D path) {
-        builder.append("d=\"");
+    public String exportPath(Point2D offset, Path2D path) {
+        StringBuilder builder = new StringBuilder();
         appendCurves(builder, offset, path);
-        builder.append("\"");
+
+        return builder.substring(0, builder.length() - 1);
     }
 
-    public void appendPaths(StringBuilder builder, List<Path2D> paths) {
-        appendPaths(builder, new Point2D(0, 0), paths);
+    public String exportPaths(List<Path2D> paths) {
+        return exportPaths(new Point2D(0, 0), paths);
     }
 
-    public void appendPaths(StringBuilder builder, Point2D offset, List<Path2D> paths) {
-        builder.append("d=\"");
+    public String exportPaths(Point2D offset, List<Path2D> paths) {
+        StringBuilder builder = new StringBuilder();
         for (int i = 0; i < paths.size(); i++) {
             Path2D path = paths.get(i);
             appendCurves(builder, offset, path);
@@ -34,7 +35,8 @@ public class SVGPathExporter {
                 builder.append(" ");
             }
         }
-        builder.append("\"");
+
+        return builder.substring(0, builder.length() - 1);
     }
 
     private void appendCurves(StringBuilder builder, Point2D offset, Path2D path) {
@@ -57,7 +59,7 @@ public class SVGPathExporter {
             }
         }
         if (path.isClosed()) {
-            builder.append("Z");
+            builder.append("Z ");
         }
     }
 

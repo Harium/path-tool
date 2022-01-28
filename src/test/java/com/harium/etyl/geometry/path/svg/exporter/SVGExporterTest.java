@@ -32,7 +32,7 @@ public class SVGExporterTest {
 
         String export = exporter.writeString(path);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-                             + "  <path d=\"M 0.0 0.0 L 10.0 10.0 L 20.0 0.0 L 30.0 10.0 \"/>\n"
+                             + "  <path d=\"M 0.0 0.0 L 10.0 10.0 L 20.0 0.0 L 30.0 10.0\"/>\n"
                              + "</svg>", export);
     }
 
@@ -54,7 +54,7 @@ public class SVGExporterTest {
 
         String export = exporter.writeString(path, defaultStyle);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-                             + "  <path id=\"my-path\" fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 0.0 0.0 L 10.0 10.0 L 20.0 0.0 L 30.0 10.0 \"/>\n"
+                             + "  <path id=\"my-path\" fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 0.0 0.0 L 10.0 10.0 L 20.0 0.0 L 30.0 10.0\"/>\n"
                              + "</svg>", export);
     }
 
@@ -66,7 +66,7 @@ public class SVGExporterTest {
 
         String export = exporter.writeString(path);
         assertEquals("<svg width=\"20\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-                             + "  <path d=\"M 0.0 0.0 Q 0.0 10.0, 10.0 10.0 Q 20.0 10.0, 20.0 0.0 \"/>\n"
+                             + "  <path d=\"M 0.0 0.0 Q 0.0 10.0, 10.0 10.0 Q 20.0 10.0, 20.0 0.0\"/>\n"
                              + "</svg>", export);
     }
 
@@ -101,9 +101,11 @@ public class SVGExporterTest {
 
         String export = exporter.writeString(paths, attributes);
         assertEquals("<svg width=\"30\" height=\"10\" xmlns=\"http://www.w3.org/2000/svg\">\n"
-                             + "  <path fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 0.0 0.0 L 10.0 10.0 \"/>\n"
-                             + "  <path fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 10.0 10.0 L 20.0 0.0 \"/>\n"
-                             + "  <path fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 20.0 0.0 L 30.0 10.0 \"/>\n"
+                             + "  <path fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 0.0 0.0 L 10.0 10.0\"/>\n"
+                             + "\n"
+                             + "  <path fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 10.0 10.0 L 20.0 0.0\"/>\n"
+                             + "\n"
+                             + "  <path fill=\"none\" stroke=\"black\" stroke-width=\"1\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-opacity=\"1\" d=\"M 20.0 0.0 L 30.0 10.0\"/>\n"
                              + "</svg>", export);
     }
 

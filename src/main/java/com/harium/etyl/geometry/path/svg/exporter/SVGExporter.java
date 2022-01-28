@@ -65,27 +65,34 @@ public class SVGExporter implements PathExporter {
     }
 
     private void exportSinglePath(Path2D path, ElementAttributes shapeAttributes, StringBuilder builder, Point2D[] coordinates) {
-        builder.append("\n  ");
-        openOnelinerTag("path", shapeAttributes, builder);
-        builder.append(" ");
+        ElementAttributes attributes = new ElementAttributes().copy(shapeAttributes);
+
         Point2D offset = new Point2D(-coordinates[0].x, -coordinates[0].y);
-        pathExporter.appendPath(builder, offset, path);
-        closeOnelinerTag(builder);
+        attributes.set("d", pathExporter.exportPath(offset, path));
+
+        builder.append("\n  ");
+        writeOnelinerTag("path", attributes, builder);
     }
 
-    public void openOnelinerTag(String tag, ElementAttributes attributes, StringBuilder builder) {
+    public void writeOnelinerTag(String tag, ElementAttributes attributes, StringBuilder builder) {
         builder.append("<");
+        writeTag(tag, attributes, builder);
+        builder.append("/>\n");
+    }
+
+    public void openTag(String tag, ElementAttributes attributes, StringBuilder builder) {
+        builder.append("<");
+        writeTag(tag, attributes, builder);
+        builder.append(">");
+    }
+
+    private void writeTag(String tag, ElementAttributes attributes, StringBuilder builder) {
         builder.append(tag);
         if (attributes != null) {
             for (Map.Entry<String, String> entry : attributes.map.entrySet()) {
                 appendAttribute(builder, entry.getKey(), entry.getValue());
             }
         }
-    }
-
-    public void openTag(String tag, ElementAttributes attributes, StringBuilder builder) {
-        openOnelinerTag(tag, attributes, builder);
-        builder.append(">");
     }
 
     private void appendAttribute(StringBuilder builder, String attribute, String value) {
@@ -100,12 +107,8 @@ public class SVGExporter implements PathExporter {
         builder.append("\"");
     }
 
-    public void closeOnelinerTag(StringBuilder builder) {
-        builder.append("/>");
-    }
-
-    private void closeTag(String tag, StringBuilder builder) {
-        builder.append("\n</");
+    public void closeTag(String tag, StringBuilder builder) {
+        builder.append("</");
         builder.append(tag);
         builder.append(">");
     }
