@@ -70,7 +70,7 @@ public class SVGExporter implements PathExporter {
         Point2D offset = new Point2D(-coordinates[0].x, -coordinates[0].y);
         attributes.set("d", pathExporter.exportPath(offset, path));
 
-        builder.append("\n  ");
+        builder.append("  ");
         writeOnelinerTag("path", attributes, builder);
     }
 
@@ -83,7 +83,7 @@ public class SVGExporter implements PathExporter {
     public void openTag(String tag, ElementAttributes attributes, StringBuilder builder) {
         builder.append("<");
         writeTag(tag, attributes, builder);
-        builder.append(">");
+        builder.append(">\n");
     }
 
     private void writeTag(String tag, ElementAttributes attributes, StringBuilder builder) {
